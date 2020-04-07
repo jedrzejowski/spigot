@@ -34,9 +34,8 @@ sha512sums=('9982554fbdadf8dab00c7cdafe312d124d0be1ffdc56b56fcc450e2bbecd5e863ca
             '829f659f1c8bad080128718248ffc5ad662b4dd8fe328fdb3a9637e2daebb11404afeef0fd2ac9bdfc39b3ea747a099426aa8373cf2744b3c4031eaa375477e2')
 
 build() {
-	:
-	# export MAVEN_OPTS="-Xmx2g"
-	# java -jar "BuildTools-${_pkgver}+b${_build}.jar" --rev "${_pkgver}"
+	export MAVEN_OPTS="-Xmx2g"
+	java -jar "BuildTools-${_pkgver}+b${_build}.jar" --rev "${_pkgver}"
 }
 
 package() {
