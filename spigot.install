@@ -13,7 +13,7 @@ post_install() {
 		useradd -r -g "${_user}" -d "${_server_root}" "${_user}" 1>/dev/null
 	fi
 
-	chown -R "${_user}":"${_user}" "${_server_root}"
+	chown -R "${_user}":"${_user}" "${_server_root}*"
 
 	echo "The world data is stored under ${_server_root} and the server runs as ${_user} user to increase security."
 	echo "Use the ${_game} script under /usr/bin/${_game} to start, stop or backup the server."
@@ -23,7 +23,7 @@ post_install() {
 }
 
 post_upgrade() {
-	chown -R "${_user}":"${_user}" "${_server_root}"
+	chown -R "${_user}":"${_user}" "${_server_root}*"
 }
 
 post_remove() {

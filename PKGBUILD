@@ -1,6 +1,8 @@
 # Maintainer: Gordian Edenhofer <gordian.edenhofer@gmail.com>
 # Submitter: Schala Zeal <schalaalexiazeal@gmail.com>
 
+_games=('-survival' '-creative')
+
 pkgname=spigot
 _pkgver=1.15.2
 _build=108
@@ -31,31 +33,52 @@ sha512sums=('9982554fbdadf8dab00c7cdafe312d124d0be1ffdc56b56fcc450e2bbecd5e863ca
             '33f456fd945bb2cfa6b390ce0ab02753cc6366e39abff80a4f2b7aa3aebe3cd31d148b785cbc2aa159dd8ad9fb03233a09f8693eb031b6b9db8dc03643d2397b'
             '829f659f1c8bad080128718248ffc5ad662b4dd8fe328fdb3a9637e2daebb11404afeef0fd2ac9bdfc39b3ea747a099426aa8373cf2744b3c4031eaa375477e2')
 
-_game="spigot"
-_server_root="/srv/craftbukkit"
-
 build() {
-	export MAVEN_OPTS="-Xmx2g"
-	java -jar "BuildTools-${_pkgver}+b${_build}.jar" --rev "${_pkgver}"
+	:
+	# export MAVEN_OPTS="-Xmx2g"
+	# java -jar "BuildTools-${_pkgver}+b${_build}.jar" --rev "${_pkgver}"
 }
 
 package() {
-	install -Dm644 "${_game}.conf" "${pkgdir}/etc/conf.d/${_game}"
-	install -Dm755 "${_game}.sh" "${pkgdir}/usr/bin/${_game}"
-	install -Dm644 "${_game}.service" "${pkgdir}/usr/lib/systemd/system/${_game}.service"
-	install -Dm644 "${_game}-backup.service" "${pkgdir}/usr/lib/systemd/system/${_game}-backup.service"
-	install -Dm644 "${_game}-backup.timer" "${pkgdir}/usr/lib/systemd/system/${_game}-backup.timer"
-	install -Dm644 "${_game}-${_pkgver}.jar" "${pkgdir}${_server_root}/${_game}.${_pkgver}.jar"
-	ln -s "${_game}.${_pkgver}.jar" "${pkgdir}${_server_root}/${_game}.jar"
 
-	# Link the log files
-	mkdir -p "${pkgdir}/var/log/"
-	install -dm775 "${pkgdir}/${_server_root}/logs"
-	ln -s "${_server_root}/logs" "${pkgdir}/var/log/${_game}"
+	base_game="spigot"
+	base_server_root="/srv/craftbukkit"
 
-	# Give the group write permissions and set user or group ID on execution
-	chmod g+ws "${pkgdir}${_server_root}"
+	for suffix in "${_games[@]}"
+	do
+		echo "package: ${suffix}"
+		my_game="${base_game}${suffix}"
+		my_server_root="${base_server_root}${suffix}"
 
-	# Make plugins folder ready for drag and drop
-	install -dm777 "${pkgdir}/${_server_root}/plugins"
+		instal_and_patch_file(){
+			src=$1
+			dst=$2
+			install -Dm644 "${src}" "${dst}"
+			sed -i "s+${base_game}+${my_game}+g" -i "${dst}"
+			sed -i "s+${base_server_root}+${my_server_root}+g" -i "${dst}"
+		}
+
+		instal_and_patch_file "${pkgname}.conf" "${pkgdir}/etc/conf.d/${my_game}"
+		instal_and_patch_file "${pkgname}.sh" "${pkgdir}/usr/bin/${my_game}"
+		chmod +x "${pkgdir}/usr/bin/${my_game}"
+		instal_and_patch_file "${pkgname}.service" "${pkgdir}/usr/lib/systemd/system/${my_game}.service"
+		instal_and_patch_file "${pkgname}-backup.service" "${pkgdir}/usr/lib/systemd/system/${my_game}-backup.service"
+		instal_and_patch_file "${pkgname}-backup.timer" "${pkgdir}/usr/lib/systemd/system/${my_game}-backup.timer"
+		instal_and_patch_file "${pkgname}-${_pkgver}.jar" "${pkgdir}${my_server_root}/${pkgname}.${_pkgver}.jar"
+		ln -s "${my_game}.${_pkgver}.jar" "${pkgdir}${my_server_root}/${my_game}.jar"
+
+		# Link the log files
+		mkdir -p "${pkgdir}/var/log/"
+		install -dm775 "${pkgdir}/${my_server_root}/logs"
+		ln -s "${my_server_root}/logs" "${pkgdir}/var/log/${my_game}"
+
+		# Give the group write permissions and set user or group ID on execution
+		chmod g+ws "${pkgdir}${my_server_root}"
+
+		# Make plugins folder ready for drag and drop
+		install -dm777 "${pkgdir}/${my_server_root}/plugins"
+
+	done
+
+	exit 1
 }
