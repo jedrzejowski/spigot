@@ -79,5 +79,4 @@ package() {
 
 	done
 
-	exit 1
 }
