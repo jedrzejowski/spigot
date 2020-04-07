@@ -63,8 +63,8 @@ package() {
 		instal_and_patch_file "${pkgname}.service" "${pkgdir}/usr/lib/systemd/system/${my_game}.service"
 		instal_and_patch_file "${pkgname}-backup.service" "${pkgdir}/usr/lib/systemd/system/${my_game}-backup.service"
 		instal_and_patch_file "${pkgname}-backup.timer" "${pkgdir}/usr/lib/systemd/system/${my_game}-backup.timer"
-		instal_and_patch_file "${pkgname}-${_pkgver}.jar" "${pkgdir}${my_server_root}/${pkgname}.${_pkgver}.jar"
-		ln -s "${my_game}.${_pkgver}.jar" "${pkgdir}${my_server_root}/${my_game}.jar"
+		install -Dm644 "${pkgname}-${_pkgver}.jar" "${pkgdir}${my_server_root}/${pkgname}.${_pkgver}.jar"
+		ln -s "${pkgname}.${_pkgver}.jar" "${pkgdir}${my_server_root}/${my_game}.jar"
 
 		# Link the log files
 		mkdir -p "${pkgdir}/var/log/"
